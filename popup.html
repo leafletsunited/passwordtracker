@@ -5,7 +5,11 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
     <title>Getting Started Extension's Popup</title>
     <style>
-    body {
+    html, body {
+      width: 400px;
+      height: 400px;
+      margin: 0;
+      padding: 0;
       font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
       font-size: 100%;
     }
@@ -17,7 +21,7 @@
       max-width: 400px;
     }
     </style>
-    <script src="popup.js"></script>
+    <!-- <script src="popup.js"></script> -->
   </head>
   <body>
     <!-- Front end libraries to make our extension look less creepy than it is -->
@@ -26,26 +30,26 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
-
-    <md-fab-speed-dial md-open="demo.isOpen" md-direction="{{demo.selectedDirection}}" ng-class="demo.selectedMode">
-      <md-fab-trigger>
-        <md-button aria-label="menu" class="md-fab md-warn">
-          <md-icon md-svg-src="settings_icon.png"></md-icon>
-        </md-button>
-      </md-fab-trigger>
-      <md-fab-actions>
-        <md-button aria-label="Low Security" class="md-fab md-raised md-mini">
-          <md-icon md-svg-src="lock_open.png" aria-label="Low Security"></md-icon>
-        </md-button>
-        <md-button aria-label="Moderate Security" class="md-fab md-raised md-mini md-accent">
-          <md-icon md-svg-src="lock_closed.png" aria-label="Moderate Security"></md-icon>
-        </md-button>
-        <md-button aria-label="High Security" class="md-fab md-raised md-mini md-warn">
-          <md-icon md-svg-src="lock_closed.png" aria-label="High Security"></md-icon>
-        </md-button>
-      </md-fab-actions>
-    </md-fab-speed-dial>
-
+    <div class="lock-size" layout="column" layout-align="center center">
+      <md-fab-speed-dial md-open="false" md-direction="down" ng-class="md-scale">
+        <md-fab-trigger>
+          <md-button aria-label="menu" class="md-fab md-warn">
+            <md-icon md-svg-src="settings_icon.png"></md-icon>
+          </md-button>
+        </md-fab-trigger>
+        <md-fab-actions>
+          <md-button aria-label="Low Security" class="md-fab md-raised md-mini">
+            <md-icon md-svg-src="lock_open.png" aria-label="Low Security"></md-icon>
+          </md-button>
+          <md-button aria-label="Moderate Security" class="md-fab md-raised md-mini md-accent">
+            <md-icon md-svg-src="lock_closed.png" aria-label="Moderate Security"></md-icon>
+          </md-button>
+          <md-button aria-label="High Security" class="md-fab md-raised md-mini md-warn">
+            <md-icon md-svg-src="lock_closed.png" aria-label="High Security"></md-icon>
+          </md-button>
+        </md-fab-actions>
+      </md-fab-speed-dial>
+    </div>
     <div id="status"></div>
     <img id="image-result" hidden>
   </body>
