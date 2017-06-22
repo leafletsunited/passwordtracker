@@ -9,7 +9,7 @@
   		"default_icon": "Safe.png",
   		"default_popup": "popup.html"
   	},
-    "backgroun":{
+    "background":{
       "scripts":["background.js"]
     },
   	"permissions": [
