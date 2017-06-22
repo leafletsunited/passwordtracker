@@ -9,10 +9,12 @@
   		"default_icon": "Safe.png",
   		"default_popup": "popup.html"
   	},
+    "backgroun":{
+      "scripts":["background.js"]
+    },
   	"permissions": [
     	"activeTab",
       "storage",
       "notifications"
   	]
-
   }
