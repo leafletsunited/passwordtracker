@@ -180,6 +180,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Notify that we saved.
       message('Settings saved');
 
+/*
+function nextChar(insertvariablehere) {
+  return String.fromCharCode(insertvariablehere.charCodeAt(0) + 3);
+}
+nextChar('a');
+*/
+
 });
 }
 });
