@@ -5,33 +5,20 @@ document.addEventListener('DOMContentLoaded', function() {
     var activeUsernameBox;
     var activePassword = "";
     var credentialsSent = false;
-    var passwords= [];
+    var passwords= [""];
 
+    chrome.storage.local.get("current_password", function(data){
+        if(data.current_password != undefined)
+        {
+             activePassword = data.current_password;
+        }
+        else
+        {
+             activePassword = "";
+        }
+});
 
-    /* Check if login attempt was made */
-    chrome.storage.local.get("login_attempt", function(data){
-        if(data.login_attempt != undefined) {
-            if(data.login_attempt == 1) {
-                //Check page for password boxes
-                var passwordBoxes = getPasswordBoxes();
-                console.log(passwordBoxes);
-                if(passwordBoxes.length == 0) {
-                    //inform semantic generator that authentication was successful
-                console.log('Authentication was Successful');
-                console.log("current_password");
-
-                } else {
-                    //inform semantic generator that authentication was unsuccessful (mostly)
-                  console.log('Authentication was Unsuccessful');
-
-                }
-              }
-            }
-          })
-
-
-
-
+    console.log(activePassword);
 
 
     var extractDomain = function(url) {
@@ -50,28 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return domain;
     };
 
-
-    /* Function to grab password values and send them to ISI server */
-
-    var process = function() {
-            if(activePassword == "") {
-                //get from chrome storage
-                chrome.storage.local.get("current_password", function(data){
-                    if(data.current_password != undefined)
-                    {
-                        activePassword = data.current_password;
-                        var newLength = passwords.push(activePassword);
-                    }
-                    else
-                    {
-                        activePassword = "";
-                    }
-                })
-            }
-
-    };
-
-
     function initListeners() {
         var inputElements = window.document.getElementsByTagName("input");
         console.log(inputElements);
@@ -82,17 +47,35 @@ document.addEventListener('DOMContentLoaded', function() {
         var actionOnPasswordKeyPress = function (eventObject) {
             activePasswordBox = this;
             activePassword = this.value;
-            chrome.storage.local.set({"current_password": this.value}, function(){});
+            console.log(this.value);
+            chrome.storage.set({"current_password": this.value}, function(){});
             return true;
         };
+        var pass = function() {
+                if(activePassword == "") {
+                    //get from chrome storage
+                    chrome.storage.local.get("current_password", function(data){
+                        if(data.current_password != undefined)
+                        {
+                            activePassword = data.current_password;
+                        }
+                        else
+                        {
+                            activePassword = "";
+                        }
+                    })
+                }
 
+        };
 
+        window.onbeforeunload = function(event) {
+          pass();
+        };
 
         var actionOnSubmit = function (eventObject) {
             //process();
             return true;
         };
-        console.log("test");
 
         /* Iterates through all the form elements on the web page and attaches the same event
          * handler on all the elements*/
@@ -129,11 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.body.addEventListener('click', initListeners, true);
 
-    window.onbeforeunload = function(event) {
-        if(!credentialsSent) {
-            process();
-        }
-    };
+
 
     var reused = function()
     {
@@ -170,23 +149,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     }
 
-    function saveChanges() {
-       var theValue = reused;
-       if (!theValue) {
-         message('Error: No value specified');
-         return;
-       }
-       chrome.storage.sync.set({'Reused passwords': theValue}, function() {
-  // Notify that we saved.
-      message('Settings saved');
-
-/*
-function nextChar(insertvariablehere) {
+});
+/*function nextChar(insertvariablehere) {
   return String.fromCharCode(insertvariablehere.charCodeAt(0) + 3);
 }
 nextChar('a');
 */
-
-});
-}
-});
