@@ -1,4 +1,3 @@
-chrome.browserAction.onClicked.addListener(function(activeTab){
-  var newURL = "http://passwords.google.com/";
-  chrome.tabs.create({ url: newURL });
+chrome.browserAction.onClicked.addListener(function() {
+chrome.tabs.create({url: 'https://passwords.google.com'});
 });

@@ -17,7 +17,7 @@ function save_options() {
 function restore_options() {
   // Use default value color = 'red' and likesColor = true.
   chrome.storage.sync.get({
-    favoriteColor: 'Low Security',
+    bestSetting: 'Low Security',
   }, function(items) {
     document.getElementById('Setting').value = items.bestSetting;
   });
