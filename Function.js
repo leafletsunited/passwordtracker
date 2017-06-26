@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     var isCredentialCaptured = false;
-    var sematicGenURL = "https://localhost";
     var activePasswordBox;
     var activeUsernameBox;
     var activePassword = "";
@@ -15,79 +14,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if(data.login_attempt == 1) {
                 //Check page for password boxes
                 var passwordBoxes = getPasswordBoxes();
+                console.log(passwordBoxes);
                 if(passwordBoxes.length == 0) {
                     //inform semantic generator that authentication was successful
-                    var URL = sematicGenURL + "/auth?success=1"
+                console.log('Authentication was Successful');
+                console.log("current_password");
+
                 } else {
                     //inform semantic generator that authentication was unsuccessful (mostly)
-                    var URL = sematicGenURL + "/auth?success=0"
+                  console.log('Authentication was Unsuccessful');
+
                 }
-                var xmlRequest = new XMLHttpRequest();
-                if(window.XMLHttpRequest) {
-                    xmlRequest.open("GET", URL, false);
-                    try {
-                        xmlRequest.send();
-                    } catch (e) {
-                        alert(e);
-                    }
-                }
-                chrome.storage.local.set({"login_attempt": 0}, function(){
-                    console.log("Authentication information sent");
-                });
+              }
             }
-        }
-    });
+          })
 
-    /* Function to select all the password text boxes on the webpage */
-    var getPasswordBoxes = function() {
-        var inputTags = document.getElementsByTagName("input");
-        var passwordTags = [];
-        for (var i = 0; i < inputTags.length; i++) {
-            if (inputTags[i].type.toLowerCase() === "password") {
-                passwordTags.push(inputTags[i]);
-            }
-        }
-        return passwordTags;
-    };
 
-    var getTextBoxes = function() {
-        var inputTags = document.getElementsByTagName("input");
-        var textTags = [];
-        for (var i = 0; i < inputTags.length; i++) {
-            if (inputTags[i].type.toLowerCase() == "text" || inputTags[i].type.toLowerCase() == "email") {
-                textTags.push(inputTags[i]);
-            }
-        }
-        return textTags;
-    };
-
-    function save_options() {
-      var setting = document.getElementById('Setting').value;
-      chrome.storage.sync.set({
-        bestSetting: setting,
-      }, function() {
-        // Update status to let user know options were saved.
-        var status = document.getElementById('status');
-        status.textContent = 'Options saved.';
-        setTimeout(function() {
-          status.textContent = '';
-        }, 750);
-      });
-    }
-
-    // Restores select box and checkbox state using the preferences
-    // stored in chrome.storage.
-    function restore_options() {
-      // Use default value color = 'red' and likesColor = true.
-      chrome.storage.sync.get({
-        bestSetting: 'Low Security',
-      }, function(items) {
-        document.getElementById('Setting').value = items.bestSetting;
-      });
-    }
-    document.addEventListener('DOMContentLoaded', restore_options);
-    document.getElementById('save').addEventListener('click',
-        save_options);
 
 
 
@@ -112,20 +54,19 @@ document.addEventListener('DOMContentLoaded', function() {
     /* Function to grab password values and send them to ISI server */
 
     var process = function() {
-        if(window.XMLHttpRequest) {
-            //get root domain name
-            var domain = extractDomain(window.location.href);
-
             if(activePassword == "") {
                 //get from chrome storage
                 chrome.storage.local.get("current_password", function(data){
-                    if(data.current_password != undefined) {
+                    if(data.current_password != undefined)
+                    {
                         activePassword = data.current_password;
                         var newLength = passwords.push(activePassword);
-                    } else {
+                    }
+                    else
+                    {
                         activePassword = "";
                     }
-                }
+                })
             }
 
     };
@@ -196,13 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var reused = function()
     {
-      int passwordNumber = passwords.length;
-      int repeated=0
+      var passwordNumber = passwords.length();
+      var repeated=0;
       for(var i = 0; i<passwords.length; i++)
       {
         if(passwords[i]==passwords[i-1])
         {
-          repeated++
+          repeated++;
         }
       }
       return repeated;
@@ -229,6 +170,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     }
 
+    function saveChanges() {
+       var theValue = reused;
+       if (!theValue) {
+         message('Error: No value specified');
+         return;
+       }
+       chrome.storage.sync.set({'Reused passwords': theValue}, function() {
+  // Notify that we saved.
+      message('Settings saved');
 
+});
 }
 });
