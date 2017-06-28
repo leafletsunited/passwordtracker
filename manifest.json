@@ -12,19 +12,19 @@
   	},
     "content_scripts":[{
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["function.js"],
+      "js": ["Function.js"],
       "run_at": "document_start"
     }],
     "background":{
-    "scripts": ["background.js"]
+    "persistent": true,
+    "scripts": ["background.js", "Function.js"]
     },
 
 
   	"permissions": [
     	"activeTab",
-      "storage",
       "https://ajax.googleapis.com/",
       "notifications",
-      "tabs"
+      "storage"
   	]
   }

@@ -1,24 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
-
     var isCredentialCaptured = false;
     var activePasswordBox;
     var activeUsernameBox;
+    var activeUsername;
     var activePassword = "";
     var credentialsSent = false;
     var passwords= [""];
 
-    chrome.storage.local.get("current_password", function(data){
-        if(data.current_password != undefined)
-        {
-             activePassword = data.current_password;
-        }
-        else
-        {
-             activePassword = "";
-        }
-});
 
-    console.log(activePassword);
+    chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+      alert("Password is: " + x);
+  });
 
 
     var extractDomain = function(url) {
@@ -38,81 +30,73 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     function initListeners() {
-        var inputElements = window.document.getElementsByTagName("input");
-        console.log(inputElements);
-        var buttonElements = window.document.getElementsByTagName("button");
+       var inputElements = window.document.getElementsByTagName("input");
+       console.log(inputElements);
+       var buttonElements = window.document.getElementsByTagName("button");
 
-        /* Action to be taken when user clicks "Submit" button */
+       /* Action to be taken when user clicks "Submit" button */
 
-        var actionOnPasswordKeyPress = function (eventObject) {
-            activePasswordBox = this;
-            activePassword = this.value;
-            console.log(this.value);
-            chrome.storage.set({"current_password": this.value}, function(){});
-            return true;
-        };
-        var pass = function() {
-                if(activePassword == "") {
-                    //get from chrome storage
-                    chrome.storage.local.get("current_password", function(data){
-                        if(data.current_password != undefined)
-                        {
-                            activePassword = data.current_password;
-                        }
-                        else
-                        {
-                            activePassword = "";
-                        }
-                    })
-                }
+       var actionOnPasswordKeyPress = function (eventObject) {
+           activePasswordBox = this;
+           activePassword = this.value;
+           //chrome.runtime.sendMessage(this.value);
+           chrome.storage.local.set({"current_password": this.value}, function(){});
+           return true;
+       };
 
-        };
+       var actionOnUsernameKeyPress = function (eventObject) {
+          activeUsernameBox = this;
+          activeUsername = this.value;
+          chrome.storage.local.set({"current_username": this.value}, function(){});
+          return true;
+      };
 
-        window.onbeforeunload = function(event) {
-          pass();
-        };
 
-        var actionOnSubmit = function (eventObject) {
-            //process();
-            return true;
-        };
+       var actionOnSubmit = function (eventObject) {
+           //process();
+           return true;
+       };
 
-        /* Iterates through all the form elements on the web page and attaches the same event
-         * handler on all the elements*/
+       /* Iterates through all the form elements on the web page and attaches the same event
+        * handler on all the elements*/
 
-        for(var i =0; i < inputElements.length; i++) {
-            var inputType = inputElements[i].type.toLowerCase();
-            if (inputElements[i].addEventListener) {
-                if(inputType == "password") {
-                    inputElements[i].addEventListener("keyup", actionOnPasswordKeyPress, false);
-                } else if(inputType == "text" || inputType == "email") {
+       for(var i =0; i < inputElements.length; i++) {
+           var inputType = inputElements[i].type.toLowerCase();
+           if (inputElements[i].addEventListener) {
+               if(inputType == "password") {
+                   inputElements[i].addEventListener("keyup", actionOnPasswordKeyPress, false);
+               } else if(inputType == "text" || inputType == "email") {
+                   inputElements[i].addEventListener("keyup", actionOnUsernameKeyPress, false);
+               } else if(inputType == "submit") {
+                   inputElements[i].addEventListener("click", actionOnSubmit, false);
+               }
+           } else if (inputElements[i].attachEvent) {
+               if(inputType == "password") {
+                   inputElements[i].attachEvent("keyup", actionOnPasswordKeyPress);
+               } else if(inputType == "text" || inputType == "email") {
+                   inputElements[i].attachEvent("keyup", actionOnUsernameKeyPress);
+               } else if(inputType == "submit") {
+                   inputElements[i].attachEvent("click", actionOnSubmit);
+               }
+           }
+       }
 
-                    inputElements[i].addEventListener("click", actionOnSubmit, false);
-                }
-            } else if (inputElements[i].attachEvent) {
-                if(inputType == "password") {
-                    inputElements[i].attachEvent("keyup", actionOnPasswordKeyPress);
-                } else if(inputType == "text" || inputType == "email") {
-
-                    inputElements[i].attachEvent("click", actionOnSubmit);
-                }
-            }
-        }
-
-        for(var i = 0; i < buttonElements.length; i++) {
-            if(buttonElements[i].addEventListener) {
-                buttonElements[i].addEventListener("mousedown", actionOnSubmit, false);
-            } else if (inputElements[i].attachEvent) {
-                buttonElements[i].attachEvent("mousedown", actionOnSubmit);
-            }
-        }
-    }
+       for(var i = 0; i < buttonElements.length; i++) {
+           if(buttonElements[i].addEventListener) {
+               buttonElements[i].addEventListener("mousedown", actionOnSubmit, false);
+           } else if (inputElements[i].attachEvent) {
+               buttonElements[i].attachEvent("mousedown", actionOnSubmit);
+           }
+       }
+   }
 
     initListeners();
 
     document.body.addEventListener('click', initListeners, true);
 
-
+    window.onbeforeunload = function(){
+      chrome.runtime.sendMessage(this.value);
+    }
 
     var reused = function()
     {
