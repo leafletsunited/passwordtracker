@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function() {
     var isCredentialCaptured = false;
     var activePasswordBox;
@@ -8,9 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var passwords= [""];
 
 
+
+   window.onload = function(){
     chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-      alert("Password is: " + x);
+      activePassword = x;
+      alert(x);
   });
+}
+
 
 
     var extractDomain = function(url) {
@@ -39,8 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
        var actionOnPasswordKeyPress = function (eventObject) {
            activePasswordBox = this;
            activePassword = this.value;
-           //chrome.runtime.sendMessage(this.value);
-           chrome.storage.local.set({"current_password": this.value}, function(){});
            return true;
        };
 
@@ -95,7 +99,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.addEventListener('click', initListeners, true);
 
     window.onbeforeunload = function(){
-      chrome.runtime.sendMessage(this.value);
+      var salt = CryptoJS.lib.WordArray.random(128/8);
+      var key = CryptoJS.PBKDF2(activePassword, salt, { keySize: 256/32 });
+      chrome.runtime.sendMessage(key);
+      console.log(key);
     }
 
     var reused = function()
