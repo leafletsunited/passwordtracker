@@ -1,7 +1,7 @@
 
   {
   	"manifest_version": 2,
-  	"name": "Password Tracker",
+  	"name": "Safe Passtracker 10000",
     "description" : "Password Storage and Protection",
     "version": "1.5",
     "options_page": "options.html",
@@ -23,6 +23,7 @@
 
   	"permissions": [
     	"activeTab",
+      "tabs",
       "https://ajax.googleapis.com/",
       "notifications",
       "storage"

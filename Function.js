@@ -6,17 +6,24 @@ document.addEventListener('DOMContentLoaded', function() {
     var activeUsername;
     var activePassword = "";
     var credentialsSent = false;
-    var passwords= [""];
+    var n = 1;
+
+    var button = document.createElement("button");
+    document.body.appendChild(button);
 
 
 
-   window.onload = function(){
-    chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-      activePassword = x;
-      alert(x);
-  });
-}
-
+var getPasswordBoxes = function() {
+    var inputTags = document.getElementsByTagName("input");
+    var passwordTags = [];
+    for (var i = 0; i < inputTags.length; i++) {
+        if (inputTags[i].type.toLowerCase() === "password") {
+            passwordTags.push(inputTags[i]);
+            n++;
+        }
+    }
+    return passwordTags;
+    };
 
 
     var extractDomain = function(url) {
@@ -45,16 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
        var actionOnPasswordKeyPress = function (eventObject) {
            activePasswordBox = this;
            activePassword = this.value;
+           n++;
            return true;
        };
 
        var actionOnUsernameKeyPress = function (eventObject) {
           activeUsernameBox = this;
           activeUsername = this.value;
-          chrome.storage.local.set({"current_username": this.value}, function(){});
           return true;
       };
-
 
        var actionOnSubmit = function (eventObject) {
            //process();
@@ -93,56 +99,35 @@ document.addEventListener('DOMContentLoaded', function() {
            }
        }
    }
-
     initListeners();
+    var url = document.location.href
+    var newUrl= url.split('?')[0]
+
 
     document.body.addEventListener('click', initListeners, true);
 
-    window.onbeforeunload = function(){
-      var salt = CryptoJS.lib.WordArray.random(128/8);
-      var key = CryptoJS.PBKDF2(activePassword, salt, { keySize: 256/32 });
-      chrome.runtime.sendMessage(key);
-      console.log(key);
-    }
 
-    var reused = function()
-    {
-      var passwordNumber = passwords.length();
-      var repeated=0;
-      for(var i = 0; i<passwords.length; i++)
+    window.onload = function(){
+      var passwordBoxes = getPasswordBoxes();
+      if(passwordBoxes.length==0)
       {
-        if(passwords[i]==passwords[i-1])
-        {
-          repeated++;
+        chrome.storage.local.get("Password" , function(data){
+        var salt = "18502";
+        var key = CryptoJS.PBKDF2(data.Password, salt, { keySize: 128/32 });
+        var newKey = key.toString();
+        var finalPass= newKey.slice(1,10);
+        chrome.runtime.sendMessage({content: finalPass, type: "m1"});})
+        chrome.storage.local.get("url" , function(data){
+        chrome.runtime.sendMessage({content: data.url, type: "m2"});})
         }
       }
-      return repeated;
-    }
 
-    var opt =
-    {
-      type: "basic",
-      title: "You have reused one password this many times:",
-      message: reused,
-      icon: "Safe.png"
-    }
-    function callback()
-    {
-      console.log('popup complete');
-    }
 
-    function notifications()
-    {
-      if(reused>5)
+    window.onbeforeunload = function(){
+      if(n>2)
       {
-        chrome.notifications.create(options, callback)
+      chrome.storage.local.set({"Password": activePassword})
+      chrome.storage.local.set({"url":  newUrl})
       }
-
     }
-
-});
-/*function nextChar(insertvariablehere) {
-  return String.fromCharCode(insertvariablehere.charCodeAt(0) + 3);
-}
-nextChar('a');
-*/
+  });
